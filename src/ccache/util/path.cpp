@@ -91,16 +91,24 @@ fprintf(stderr, "normalized_path %s\n", normalized_path.string().c_str());
 fprintf(stderr, "closest_existing_path %s\n", closest_existing_path.string().c_str());
     if (path_suffix.empty()) {
       path_suffix = closest_existing_path.filename();
+fprintf(stderr, "path_suffix empty -> %s\n", path_suffix.string().c_str());
     } else {
       path_suffix = closest_existing_path.filename() / path_suffix;
+fprintf(stderr, "path_suffix = %s\n", path_suffix.string().c_str());
     }
     closest_existing_path = closest_existing_path.parent_path();
+fprintf(stderr, "closest_existing_path now %s - exists %d\n", closest_existing_path.string().c_str(), fs::exists(closest_existing_path) ? 1 : 0);
   }
+fprintf(stderr, "closest_existing_path finally %s\n", closest_existing_path.string().c_str());
 
   const auto add_relpath_candidates = [&](auto p) {
-    relpath_candidates.push_back(p.lexically_relative(actual_cwd));
+fs::path rel = p.lexically_relative(actual_cwd);
+fprintf(stderr, "%s lexically_relative(%s) = %s\n", p.string().c_str(), actual_cwd.string().c_str(), rel.string().c_str());
+    relpath_candidates.push_back(rel);
     if (apparent_cwd != actual_cwd) {
-      relpath_candidates.emplace_back(p.lexically_relative(apparent_cwd));
+      fs::path rel2 = p.lexically_relative(apparent_cwd);
+fprintf(stderr, "rel2 %s\n", rel2.string().c_str());
+      relpath_candidates.emplace_back(rel2);
     }
   };
 
