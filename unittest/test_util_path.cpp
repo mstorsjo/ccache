@@ -103,7 +103,10 @@ TEST_CASE("util::make_relative_path")
   SUBCASE("Path matches neither actual nor apparent CWD")
   {
 #ifdef _WIN32
-    CHECK(make_relative_path("C:/a", "C:/b", "C:/x") == "C:/x");
+    // libc++ before 20.x on Windows produces \x instead of C:/x here.
+    fs::path rel = make_relative_path("C:/a", "C:/b", "C:/x");
+    bool expected = rel == "C:/x" || rel == "\\x";
+    CHECK(expected);
 #else
     CHECK(make_relative_path("/a", "/b", "/x") == "/x");
 #endif
