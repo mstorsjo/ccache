@@ -23,6 +23,9 @@
 #include <ccache/util/format.hpp>
 #include <ccache/util/string.hpp>
 
+#include <stdio.h>
+#include <iostream>
+
 #ifdef _WIN32
 const char k_dev_null_path[] = "nul:";
 #else
@@ -78,11 +81,14 @@ make_relative_path(const fs::path& actual_cwd,
   DEBUG_ASSERT(apparent_cwd.is_absolute());
   DEBUG_ASSERT(path.is_absolute());
 
+fprintf(stderr, "make_relative_path \"%s\" \"%s\" \"%s\"\n", actual_cwd.string().c_str(), apparent_cwd.string().c_str(), path.string().c_str());
   fs::path normalized_path = util::lexically_normal(path);
+fprintf(stderr, "normalized_path %s\n", normalized_path.string().c_str());
   fs::path closest_existing_path = normalized_path;
   std::vector<fs::path> relpath_candidates;
   fs::path path_suffix;
   while (!fs::exists(closest_existing_path)) {
+fprintf(stderr, "closest_existing_path %s\n", closest_existing_path.string().c_str());
     if (path_suffix.empty()) {
       path_suffix = closest_existing_path.filename();
     } else {
@@ -104,6 +110,8 @@ make_relative_path(const fs::path& actual_cwd,
   if (real_closest_existing_path != closest_existing_path) {
     add_relpath_candidates(real_closest_existing_path);
   }
+for (const auto &p : relpath_candidates)
+fprintf(stderr, "relpath_candidates: %s\n", p.string().c_str());
 
   // Find best (i.e. shortest existing) match:
   std::sort(relpath_candidates.begin(),
@@ -113,13 +121,23 @@ make_relative_path(const fs::path& actual_cwd,
                      < util::pstr(path2).str().length();
             });
   for (const auto& relpath : relpath_candidates) {
+fprintf(stderr, "inspecting %s vs %s\n", relpath.string().c_str(), closest_existing_path.string().c_str());
     if (fs::equivalent(relpath, closest_existing_path)) {
-      return path_suffix.empty() ? relpath
-                                 : (relpath / path_suffix).lexically_normal();
+fprintf(stderr, "returning, path_suffix %s\n", path_suffix.string().c_str());
+      if (path_suffix.empty()) {
+fprintf(stderr, "returning relpath %s\n", relpath.string().c_str());
+return relpath;
+} else {
+fprintf(stderr, "returning relpath %s\n", relpath.string().c_str());
+fs::path ret = (relpath / path_suffix).lexically_normal();
+fprintf(stderr, "ret %s\n", ret.string().c_str());
+return ret;
+}
     }
   }
 
   // No match so nothing else to do than to return the unmodified path.
+fprintf(stderr, "returning path %s\n", path.string().c_str());
   return path;
 }
 
