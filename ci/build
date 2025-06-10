@@ -43,7 +43,7 @@ else
 
     case "${RUN_TESTS:-all}" in
         all)
-            ./unittest/unittest.exe
+            ./unittest/unittest.exe --tc=util::make_relative_path
             ;;
         unittest-in-wine)
             wine unittest/unittest.exe
