@@ -188,16 +188,15 @@ jobs:
             compiler: gcc
             os: windows-latest
 
-          - sys: mingw64
+          - sys: clang64
             compiler: clang
-            extra_cmake_params: -DCMAKE_CXX_FLAGS=-Wno-deprecated
             os: windows-latest
 
           - sys: clangarm64
             compiler: clang
             os: windows-11-arm
 
-    name: 'Windows MSYS2 ${{ matrix.sys }} ${{ matrix.compiler }}'
+    name: 'Windows MSYS2 ${{ matrix.sys }}'
     defaults:
       run:
         shell: msys2 {0}
@@ -217,17 +216,9 @@ jobs:
             ninja:p
             hiredis:p
             lld:p
-            ${{matrix.compiler}}:p
 
       - name: Set up environment
         run: |
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo "CC=gcc" >> $GITHUB_ENV
-            echo "CXX=g++" >> $GITHUB_ENV
-          else
-            echo "CC=clang" >> $GITHUB_ENV
-            echo "CXX=clang++" >> $GITHUB_ENV
-          fi
           cmake_params=(-DCMAKE_BUILD_TYPE=CI)
           cmake_params+=(${{matrix.extra_cmake_params}})
           echo "CMAKE_PARAMS=${cmake_params[*]}" >> $GITHUB_ENV
@@ -251,7 +242,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.sys }}-${{ matrix.compiler }}-testdir.tar.xz
+          name: ${{ matrix.sys }}-testdir.tar.xz
           path: testdir.tar.xz
 
   build_macos_universal:
