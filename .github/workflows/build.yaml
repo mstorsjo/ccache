@@ -193,6 +193,10 @@ jobs:
             compiler: clang
             os: windows-latest
 
+          - sys: clang64
+            compiler: clang
+            os: windows-latest
+
           - sys: clangarm64
             compiler: clang
             os: windows-11-arm
