@@ -26,6 +26,7 @@
 #include <doctest/doctest.h>
 
 #include <ostream> // https://github.com/doctest/doctest/issues/618
+#include <iostream>
 
 namespace fs = util::filesystem;
 
@@ -103,7 +104,9 @@ TEST_CASE("util::make_relative_path")
   SUBCASE("Path matches neither actual nor apparent CWD")
   {
 #ifdef _WIN32
-    CHECK(make_relative_path("C:/a", "C:/b", "C:/x") == "C:/x");
+    auto out = make_relative_path("C:/a", "C:/b", "C:/x");
+std::cout<<out<<"\n";
+    CHECK(out == "C:/x");
 #else
     CHECK(make_relative_path("/a", "/b", "/x") == "/x");
 #endif
