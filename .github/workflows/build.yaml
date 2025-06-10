@@ -244,11 +244,9 @@ jobs:
           TEST_CC: gcc
 
       - name: Collect testdir from failed tests
-        if: failure()
         run: ci/collect-testdir
 
       - name: Upload testdir from failed tests
-        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.sys }}-${{ matrix.compiler }}-testdir.tar.xz
