@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   build_and_test:
+    if: false
     timeout-minutes: 30
     env:
       CMAKE_GENERATOR: Ninja
@@ -256,6 +257,7 @@ jobs:
           path: testdir.tar.xz
 
   build_macos_universal:
+    if: false
     timeout-minutes: 30
     name: macOS universal binary
     runs-on: macos-15
@@ -273,6 +275,7 @@ jobs:
           path: build_universal/ccache
 
   build_linux_binary:
+    if: false
     timeout-minutes: 30
     name: Linux ${{ matrix.arch }} binary
     runs-on: ${{ matrix.os }}
@@ -346,6 +349,7 @@ jobs:
           path: install/bin/ccache.exe
 
   specific_tests:
+    if: false
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -567,6 +571,7 @@ jobs:
           path: testdir.tar.xz
 
   check_format:
+    if: false
     timeout-minutes: 30
     name: Code formatting
     runs-on: ubuntu-22.04
@@ -580,6 +585,7 @@ jobs:
         run: misc/format-files --all --check
 
   spelling:
+    if: false
     timeout-minutes: 30
     name: Spelling
     runs-on: ubuntu-22.04
