@@ -2,6 +2,8 @@
 
 set -eu
 
+: ${CMAKE_PARAMS:=}
+
 mkdir -p "build"
 cd "build"
 cmake \
@@ -9,6 +11,7 @@ cmake \
     -D DEPS=DOWNLOAD \
     -D ENABLE_TESTING=OFF \
     -D CMAKE_INSTALL_PREFIX=$(pwd)/../install \
+    ${CMAKE_PARAMS} \
     ..
 cmake --build .
 cmake --install . --strip

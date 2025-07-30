@@ -290,42 +290,42 @@ jobs:
 
   build_windows_binary:
     timeout-minutes: 30
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - sys: mingw64
-            arch: x86_64
-            os: windows-latest
+          - arch: i686
+            toolchain: i686-w64-mingw32-posix
+            apt_get: g++-mingw-w64-i686-posix
 
-          - sys: mingw32
-            arch: i686
-            os: windows-latest
+          - arch: x86_64
+            toolchain: x86_64-w64-mingw32-posix
+            apt_get: g++-mingw-w64-x86-64-posix
 
-          - sys: clangarm64
-            arch: aarch64
-            os: windows-11-arm
+          - arch: aarch64
+            toolchain: aarch64-w64-mingw32
+            llvm_mingw: true
 
     name: Windows ${{ matrix.arch }} binary
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
-      - name: '${{ matrix.sys }} Set up MSYS2'
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: ${{matrix.sys}}
-          install: >-
-            git
-          pacboy: >-
-            toolchain:p
-            cmake:p
-            ninja:p
-
+      - name: Run apt-get
+        if: matrix.apt_get != ''
+        run: sudo apt-get update && sudo apt-get install ${{ matrix.apt_get }}
+      - name: Install llvm-mingw
+        if: matrix.llvm_mingw != ''
+        run: |
+          curl -LO https://github.com/mstorsjo/llvm-mingw/releases/download/20250709/llvm-mingw-20250709-ucrt-ubuntu-22.04-x86_64.tar.xz
+          tar -Jxf llvm-mingw-*.tar.xz
+          rm *.tar.xz
+          sudo mkdir -p /opt
+          sudo mv llvm-mingw-* /opt/llvm-mingw
+          echo /opt/llvm-mingw/bin >> $GITHUB_PATH
       - name: Get source
         uses: actions/checkout@v4
       - name: Build binary
+        env:
+          CMAKE_PARAMS: -D CMAKE_TOOLCHAIN_FILE=../toolchains/${{ matrix.toolchain }}.cmake
         run: ci/build-binary
       - name: Archive binary
         uses: actions/upload-artifact@v4
