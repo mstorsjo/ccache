@@ -43,7 +43,8 @@ else
 
     case "${RUN_TESTS:-all}" in
         all)
-            CC="${TEST_CC}" ctest --output-on-failure -j"${JOBS}" "$@"
+            #CC="${TEST_CC}" ctest --output-on-failure -j"${JOBS}" "$@"
+            CC="${TEST_CC}" CCACHE=$(pwd)/ccache.exe ${CCACHE_LOC}/test/run -v direct
             ;;
         unittest-in-wine)
             wine unittest/unittest.exe
